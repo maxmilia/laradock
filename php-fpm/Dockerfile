@@ -23,6 +23,8 @@ ARG LARADOCK_PHP_VERSION
 # Set Environment Variables
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+
 # always run apt update when start and after add new source list, then clean up at end.
 RUN apt-get update -yqq && \
     apt-get install -y apt-utils && \
@@ -128,7 +130,7 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
   if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
     pecl install xdebug-2.5.5; \
   else \
-    pecl install xdebug; \
+    pecl install https://pecl.php.net/get/xdebug-2.6.1.tgz; \
   fi && \
   docker-php-ext-enable xdebug \
 ;fi
@@ -173,7 +175,7 @@ ARG INSTALL_PHPREDIS=false
 
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
-    printf "\n" | pecl install -o -f redis \
+    printf "\n" | pecl install -o -f redis-4.2.0 \
     &&  rm -rf /tmp/pear \
     &&  docker-php-ext-enable redis \
 ;fi
@@ -196,6 +198,18 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
       fi \
     fi && \
     docker-php-ext-enable swoole \
+;fi
+
+###########################################################################
+# Yaf EXTENSION
+###########################################################################
+
+ARG INSTALL_YAF=false
+ENV INSTALL_YAF ${INSTALL_YAF}
+COPY ./yaf.ini /usr/local/etc/php/conf.d/yaf.ini
+RUN if [ ${INSTALL_YAF} = true ]; then \
+    pecl install http://pecl.php.net/get/yaf-3.0.7.tgz && \
+    docker-php-ext-enable yaf \
 ;fi
 
 ###########################################################################
@@ -492,7 +506,7 @@ ARG INSTALL_IMAGEMAGICK=false
 
 RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
     apt-get install -y libmagickwand-dev imagemagick && \
-    pecl install imagick && \
+    pecl install http://pecl.php.net/get/imagick-3.4.3.tgz && \
     docker-php-ext-enable imagick \
 ;fi
 

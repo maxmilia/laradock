@@ -37,6 +37,8 @@ ARG PGID=1000
 ENV PGID ${PGID}
 
 # always run apt update when start and after add new source list, then clean up at end.
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+
 RUN apt-get update -yqq && \
     pecl channel-update pecl.php.net && \
     groupadd -g ${PGID} laradock && \
@@ -360,7 +362,7 @@ ARG INSTALL_PHPREDIS=false
 
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis extension
-    printf "\n" | pecl -q install -o -f redis && \
+    printf "\n" | pecl -q install -o -f http://pecl.php.net/get/redis-4.2.0.tgz && \
     echo "extension=redis.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/redis.ini && \
     phpenmod redis \
 ;fi
@@ -384,6 +386,21 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
     fi && \
     echo "extension=swoole.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/swoole.ini && \
     ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/swoole.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-swoole.ini \
+;fi
+
+###########################################################################
+# Yaf EXTENSION
+###########################################################################
+
+ARG INSTALL_YAF=true
+
+COPY ./yaf.ini /usr/local/etc/php/conf.d/yaf.ini
+RUN if [ ${INSTALL_YAF} = true ]; then \
+    pecl install http://pecl.php.net/get/yaf-3.0.7.tgz && \
+    # docker-php-ext-enable yaf \
+        echo "extension=yaf.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yaf.ini && \
+        echo "yaf.use_namespace=1" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yaf.ini && \
+    ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yaf.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-yaf.ini \
 ;fi
 
 ###########################################################################
@@ -830,7 +847,7 @@ RUN if [ ${INSTALL_PG_CLIENT} = true ]; then \
 USER root
 
 RUN apt-get update -yqq \
-    && apt-get -yqq install nasm 
+    && apt-get -yqq install nasm
 
 ###########################################################################
 # Dusk Dependencies:

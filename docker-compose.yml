@@ -154,6 +154,7 @@ services:
           - INSTALL_LDAP=${PHP_FPM_INSTALL_LDAP}
           - INSTALL_PHALCON=${PHP_FPM_INSTALL_PHALCON}
           - INSTALL_SWOOLE=${PHP_FPM_INSTALL_SWOOLE}
+          - INSTALL_YAF=${PHP_FPM_INSTALL_YAF}
           - INSTALL_IMAGE_OPTIMIZERS=${PHP_FPM_INSTALL_IMAGE_OPTIMIZERS}
           - INSTALL_IMAGEMAGICK=${PHP_FPM_INSTALL_IMAGEMAGICK}
           - INSTALL_CALENDAR=${PHP_FPM_INSTALL_CALENDAR}
@@ -740,7 +741,7 @@ services:
       networks:
         - frontend
         - backend
-        
+
 ### Solr ################################################
     solr:
       build:
@@ -902,15 +903,15 @@ services:
         context: ./gitlab
       environment:
         GITLAB_OMNIBUS_CONFIG: |
-          external_url '${GITLAB_DOMAIN_NAME}' 
-          redis['enable'] = false 
-          nginx['listen_https'] = false 
-          nginx['listen_port'] = 80 
-          postgresql['enable'] = false 
-          gitlab_rails['trusted_proxies'] = ['caddy','nginx','apache2'] 
-          gitlab_rails['redis_host'] = 'redis' 
+          external_url '${GITLAB_DOMAIN_NAME}'
+          redis['enable'] = false
+          nginx['listen_https'] = false
+          nginx['listen_port'] = 80
+          postgresql['enable'] = false
+          gitlab_rails['trusted_proxies'] = ['caddy','nginx','apache2']
+          gitlab_rails['redis_host'] = 'redis'
           gitlab_rails['redis_database'] = 8
-          gitlab_rails['db_host'] = 'postgres' 
+          gitlab_rails['db_host'] = 'postgres'
           gitlab_rails['db_username'] = 'laradock_gitlab'
           gitlab_rails['db_password'] = 'laradock_gitlab'
           gitlab_rails['db_database'] = 'laradock_gitlab'
@@ -937,7 +938,7 @@ services:
         - ${DATA_PATH_HOST}/gitlab/runner:/etc/gitlab-runner
         - /var/run/docker.sock:/var/run/docker.sock:rw
       restart: always
-      
+
 ### JupyterHub #########################################
     jupyterhub:
       build:
@@ -1048,7 +1049,7 @@ services:
         - backend
       depends_on:
         - mongo
-  
+
 ### Metabase #################################################
     metabase:
       image: metabase/metabase:latest
