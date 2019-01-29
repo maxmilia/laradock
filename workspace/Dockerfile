@@ -392,7 +392,7 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
 # Yaf EXTENSION
 ###########################################################################
 
-ARG INSTALL_YAF=true
+ARG INSTALL_YAF=false
 
 COPY ./yaf.ini /usr/local/etc/php/conf.d/yaf.ini
 RUN if [ ${INSTALL_YAF} = true ]; then \
